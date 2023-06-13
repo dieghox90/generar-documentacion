@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    command: uvicorn main:app --host 0.0.0.0
+    environment:
+      FILE_MANAGER_FOLDER_HOST: ${FILE_MANAGER_FOLDER_HOST}
+      FILE_MANAGER_FOLDER_DOCKER: ${FILE_MANAGER_FOLDER_DOCKER}
+    volumes:
+      #- C://Users//Usuario//Desktop//FILES:/templates/
+      - ${FILE_MANAGER_FOLDER_HOST}:${FILE_MANAGER_FOLDER_DOCKER}
+    ports:
+      - 8000:8000
+

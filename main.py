@@ -1,6 +1,5 @@
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Body, Response
 from pydantic import BaseModel
-from typing import Optional
 from dotenv import load_dotenv
 
 import jinja2
@@ -28,9 +27,10 @@ class Documento(BaseModel):
 @app.post('/generar/documentos/',tags=['Generar - Documentos'])
 def generar(documentos:list[Documento]=Body()):
     
+    
     for documento in documentos:
         
-        ruta_template = os.getenv('FILE_MANAGER_FOLDER')+documento.path_html
+        ruta_template = os.getenv('FILE_MANAGER_FOLDER_DOCKER')+documento.path_html
         nombre_template=ruta_template.split('/')[-1]
         ruta_template = ruta_template.replace(nombre_template,'')
         
@@ -46,8 +46,14 @@ def generar(documentos:list[Documento]=Body()):
         }
         
         pdf = pdfkit.from_string(html,False,configuration=config,options=options)
-        with open(os.getenv('FILE_MANAGER_FOLDER')+documento.path_save+'/'+nombre_template.replace('.html','')+".pdf", 'wb') as output:
-            output.write(pdf)
+        #with open(os.getenv('FILE_MANAGER_FOLDER')+documento.path_save+'/'+nombre_template.replace('.html','')+".pdf", 'wb') as output:
+         #   output.write(pdf)
+        
+        with open(os.getenv('FILE_MANAGER_FOLDER_DOCKER')+documento.path_save+'/'+nombre_template.replace('.html','')+".pdf", 'wb') as output:
+            output.write(pdf)  
+          
+          
+            
         #response = Response( content=pdf, media_type="application/pdf") #pdf, content_type='application/pdf'
     return True
 
