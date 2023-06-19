@@ -1,10 +1,12 @@
 from fastapi import FastAPI, Body, Response
 from pydantic import BaseModel
 from dotenv import load_dotenv
+from fastapi.middleware.cors import CORSMiddleware
 
 import jinja2
 import pdfkit
 import os
+
 
 load_dotenv()
 
@@ -15,13 +17,25 @@ app = FastAPI()
 app.title='Generar Documentacion'
 app.version='1.0.1'
 
+#Activamos Cors
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+
 
 #Creamos el modelo
 class Documento(BaseModel):
     path_html:str
     path_save:str
     data:dict
-
 
 
 @app.post('/generar/documentos/',tags=['Generar - Documentos'])
