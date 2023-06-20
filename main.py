@@ -1,4 +1,5 @@
-from fastapi import FastAPI, Body, Response
+from ast import List
+from fastapi import FastAPI, Body
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
@@ -39,11 +40,14 @@ class Documento(BaseModel):
 
 
 @app.post('/generar/documentos/',tags=['Generar - Documentos'])
-def generar(documentos:list[Documento]=Body()):
+#def generar(documentos:list[Documento]=Body()):
+def generar(documentos:list[Documento]=Body(),logos:list[str]=Body()):
+    
     
     
     for documento in documentos:
         
+    
         ruta_template = os.getenv('FILE_MANAGER_FOLDER_DOCKER')+documento.path_html
         nombre_template=ruta_template.split('/')[-1]
         ruta_template = ruta_template.replace(nombre_template,'')
@@ -52,7 +56,20 @@ def generar(documentos:list[Documento]=Body()):
         env = jinja2.Environment(loader=jinja2.FileSystemLoader(ruta_template))
         template=env.get_template(nombre_template)
 
-        html = template.render(documento.data)
+        #Uniendo diccionarios
+        myDict = {}
+        myDict["logos"] = []
+        #cuando hay logos
+        if(len(logos)>0):
+            myDict["logos"]=logos
+            c = documento.data | myDict
+            html = template.render(c)
+        else:
+            html = template.render(documento.data)    
+       
+        
+        
+        
             
         config = pdfkit.configuration(wkhtmltopdf=os.getenv('PATH_WKHTMLTOPDF'))
         options={
